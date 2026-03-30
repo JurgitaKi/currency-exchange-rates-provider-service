@@ -1,0 +1,31 @@
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Maven wrapper cache
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+*.eclipse
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Spring Boot DevTools
+.springBeans

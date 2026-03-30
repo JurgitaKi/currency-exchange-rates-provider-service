@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: currency-exchange-rates-provider-service
+
+  datasource:
+    url: jdbc:h2:mem:currencydb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+
+  cache:
+    type: simple
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+
+logging:
+  level:
+    com.example.currencyexchange: DEBUG
+    org.springframework.security: INFO
+
+# Exchange rate providers configuration
+exchange:
+  providers:
+    frankfurter:
+      base-url: https://api.frankfurter.app
+    openexchangerates:
+      base-url: https://openexchangerates.org/api
+      # api-key: your-api-key-here  # Uncomment and set to enable OpenExchangeRates
+
+  scheduler:
+    cron: "0 0 * * * *"  # Every hour
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
