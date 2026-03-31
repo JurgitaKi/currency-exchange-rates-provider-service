@@ -2,9 +2,9 @@ package com.example.currencyexchange.service;
 
 import com.example.currencyexchange.client.ExchangeRateClient;
 import com.example.currencyexchange.exception.ExchangeRateFetchException;
+import com.example.currencyexchange.exception.ExchangeRateNotAvailableException;
 import com.example.currencyexchange.exception.InsufficientDataException;
 import com.example.currencyexchange.model.Currency;
-import com.example.currencyexchange.model.ExchangeRate;
 import com.example.currencyexchange.model.HistoricalRate;
 import com.example.currencyexchange.repository.CurrencyRepository;
 import com.example.currencyexchange.repository.ExchangeRateRepository;
@@ -21,9 +21,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ExchangeRateServiceTest {
@@ -55,36 +60,24 @@ class ExchangeRateServiceTest {
         eur = Currency.builder().id(1L).code("EUR").name("Euro").active(true).build();
         usd = Currency.builder().id(2L).code("USD").name("US Dollar").active(true).build();
         gbp = Currency.builder().id(3L).code("GBP").name("British Pound").active(true).build();
-        when(rateCacheService.get(anyString(), anyString())).thenReturn(Optional.empty());
     }
 
     @Test
     void convert_returnsCorrectConvertedAmount() {
-        ExchangeRate rate = ExchangeRate.builder()
-                .fromCurrency(usd)
-                .toCurrency(eur)
-                .rate(new BigDecimal("0.9200"))
-                .provider("Frankfurter")
-                .fetchedAt(LocalDateTime.now())
-                .build();
-
-        when(exchangeRateRepository.findByFromCodeAndToCode("USD", "EUR"))
-                .thenReturn(Optional.of(rate));
+        when(rateCacheService.get("USD", "EUR")).thenReturn(Optional.of(new BigDecimal("0.9200")));
 
         var result = exchangeRateService.convert(new BigDecimal("100"), "USD", "EUR");
 
         assertThat(result.fromCurrency()).isEqualTo("USD");
         assertThat(result.toCurrency()).isEqualTo("EUR");
         assertThat(result.convertedAmount()).isEqualByComparingTo(new BigDecimal("92.0000"));
+        assertThat(result.provider()).isEqualTo("cache");
     }
 
     @Test
     void convert_throwsWhenRateNotFound() {
-        when(exchangeRateRepository.findByFromCodeAndToCode("USD", "JPY"))
-                .thenReturn(Optional.empty());
-
         assertThatThrownBy(() -> exchangeRateService.convert(BigDecimal.TEN, "USD", "JPY"))
-                .isInstanceOf(com.example.currencyexchange.exception.CurrencyNotFoundException.class);
+                .isInstanceOf(ExchangeRateNotAvailableException.class);
     }
 
     @Test

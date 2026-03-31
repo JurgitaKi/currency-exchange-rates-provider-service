@@ -21,7 +21,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -41,7 +46,10 @@ import java.util.List;
 @RequestMapping("/api/v1/currency")
 @RequiredArgsConstructor
 @Validated
-@Tag(name = "Currency Exchange", description = "Endpoints for querying and managing currency exchange rates")
+@Tag(
+        name = "Currency Exchange",
+        description = "Endpoints for querying and managing currency exchange rates"
+)
 public class CurrencyController {
 
     private final CurrencyService currencyService;
@@ -51,7 +59,10 @@ public class CurrencyController {
     // 1. GET /api/v1/currency
     // -------------------------------------------------------------------------
 
-    @Operation(summary = "List supported currencies", description = "Returns all active currencies tracked by the service")
+    @Operation(
+            summary = "List supported currencies",
+            description = "Returns all active currencies tracked by the service"
+    )
     @ApiResponse(responseCode = "200", description = "List of currencies returned successfully")
     @GetMapping
     public ResponseEntity<List<CurrencyResponse>> getSupportedCurrencies() {
@@ -63,7 +74,10 @@ public class CurrencyController {
     // 2. POST /api/v1/currency?currency=USD
     // -------------------------------------------------------------------------
 
-    @Operation(summary = "Add a currency", description = "Registers a new currency to be tracked. Requires ADMIN role.")
+    @Operation(
+            summary = "Add a currency",
+            description = "Registers a new currency to be tracked. Requires ADMIN role."
+    )
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Currency created"),
         @ApiResponse(responseCode = "409", description = "Currency already exists"),
@@ -86,7 +100,10 @@ public class CurrencyController {
     // 3. GET /api/v1/currency/exchange-rates?amount=15&from=USD&to=EUR
     // -------------------------------------------------------------------------
 
-    @Operation(summary = "Convert currency", description = "Converts an amount from one currency to another using the latest cached rate")
+    @Operation(
+            summary = "Convert currency",
+            description = "Converts an amount from one currency to another using the latest cached rate"
+    )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Conversion result returned"),
         @ApiResponse(responseCode = "404", description = "Exchange rate pair not found"),
@@ -97,14 +114,19 @@ public class CurrencyController {
             @Valid @ModelAttribute ConvertRequest request) {
 
         log.debug("Converting {} {} to {}", request.amount(), request.from(), request.to());
-        return ResponseEntity.ok(exchangeRateService.convert(request.amount(), request.from(), request.to()));
+        ExchangeRateResponse response = exchangeRateService.convert(
+                request.amount(), request.from(), request.to());
+        return ResponseEntity.ok(response);
     }
 
     // -------------------------------------------------------------------------
     // 4. POST /api/v1/currency/exchange-rates/refresh
     // -------------------------------------------------------------------------
 
-    @Operation(summary = "Force rate refresh", description = "Triggers an immediate fetch from all configured providers. Requires ADMIN role.")
+    @Operation(
+            summary = "Force rate refresh",
+            description = "Triggers an immediate fetch from all configured providers. Requires ADMIN role."
+    )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Rates refreshed successfully"),
         @ApiResponse(responseCode = "503", description = "All providers failed"),
@@ -122,7 +144,10 @@ public class CurrencyController {
     // 5. GET /api/v1/currency/exchange-rates/trends?from=USD&to=EUR&period=12H
     // -------------------------------------------------------------------------
 
-    @Operation(summary = "Get rate trend", description = "Returns percentage change over a time window. Requires ADMIN or PREMIUM_USER role.")
+    @Operation(
+            summary = "Get rate trend",
+            description = "Returns percentage change over a time window. Requires ADMIN or PREMIUM_USER role."
+    )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Trend data returned"),
         @ApiResponse(responseCode = "404", description = "Currency pair not found"),
@@ -145,7 +170,10 @@ public class CurrencyController {
             String to,
 
             @RequestParam(defaultValue = "24H")
-            @Pattern(regexp = "\\d+[HDMYhdmy]", message = "Period must match pattern: e.g. 12H, 10D, 3M, 1Y")
+            @Pattern(
+                    regexp = "\\d+[HDMYhdmy]",
+                    message = "Period must match pattern: e.g. 12H, 10D, 3M, 1Y"
+            )
         @Parameter(description = "Time window, e.g. 12H, 10D, 3M, 1Y", example = "24H")
             String period) {
 

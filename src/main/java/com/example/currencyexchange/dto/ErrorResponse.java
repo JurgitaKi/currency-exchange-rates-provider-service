@@ -14,4 +14,4 @@ public record ErrorResponse(
         String message,
         String path,
         LocalDateTime timestamp
-) {}
+) { }

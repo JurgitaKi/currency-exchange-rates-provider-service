@@ -126,10 +126,10 @@ class CurrencyIntegrationTest extends AbstractIntegrationTest {
             ErrorResponse.class
         );
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().timestamp()).isNotNull();
-        assertThat(response.getBody().status()).isEqualTo(404);
+        assertThat(response.getBody().status()).isEqualTo(503);
         assertThat(response.getBody().error()).isNotBlank();
         assertThat(response.getBody().message()).isNotBlank();
         assertThat(response.getBody().path()).contains("exchange-rates");

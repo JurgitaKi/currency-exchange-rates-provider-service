@@ -23,11 +23,15 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("Currency Exchange Rates API")
-                        .description("Provides real-time and historical currency exchange rates fetched from multiple providers.")
+                        .description(
+                                "Provides real-time and historical currency exchange rates fetched from multiple providers."
+                        )
                         .version("1.0.0")
-                        .contact(new Contact()
-                                .name("Currency Exchange Service")
-                                .email("support@currency-exchange.example.com")))
+                        .contact(
+                                new Contact()
+                                        .name("Currency Exchange Service")
+                                        .email("support@currency-exchange.example.com")
+                        ))
                 .addSecurityItem(new SecurityRequirement().addList(BASIC_AUTH))
                 .components(new Components()
                         .addSecuritySchemes(BASIC_AUTH, new SecurityScheme()

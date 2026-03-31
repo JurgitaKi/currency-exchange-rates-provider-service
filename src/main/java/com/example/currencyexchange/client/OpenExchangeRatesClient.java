@@ -71,5 +71,5 @@ public class OpenExchangeRatesClient implements ExchangeRateClient {
             String base,
             long timestamp,
             Map<String, BigDecimal> rates
-    ) {}
+    ) { }
 }

@@ -21,9 +21,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Base64;
 
-import com.example.currencyexchange.dto.ErrorResponse;
-import com.example.currencyexchange.dto.TrendResponse;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
@@ -48,16 +45,13 @@ class ExchangeRateIntegrationTest extends AbstractIntegrationTest {
     @BeforeEach
     void setUpData() {
         WIREMOCK.resetAll();
+        historicalRateRepository.deleteAll();
+        exchangeRateRepository.deleteAll();
+        currencyRepository.deleteAll();
 
-        if (!currencyRepository.existsByCode("EUR")) {
-            currencyRepository.save(Currency.builder().code("EUR").name("Euro").active(true).build());
-        }
-        if (!currencyRepository.existsByCode("USD")) {
-            currencyRepository.save(Currency.builder().code("USD").name("US Dollar").active(true).build());
-        }
-        if (!currencyRepository.existsByCode("GBP")) {
-            currencyRepository.save(Currency.builder().code("GBP").name("British Pound").active(true).build());
-        }
+        currencyRepository.save(Currency.builder().code("EUR").name("Euro").active(true).build());
+        currencyRepository.save(Currency.builder().code("USD").name("US Dollar").active(true).build());
+        currencyRepository.save(Currency.builder().code("GBP").name("British Pound").active(true).build());
     }
 
     @Test
@@ -206,9 +200,8 @@ class ExchangeRateIntegrationTest extends AbstractIntegrationTest {
      */
     @Test
     void getTrend_sufficientHistoricalData_returnsTrendResponse() {
-        // Setup currencies
-        Currency eur = currencyRepository.save(Currency.builder().code("EUR").name("Euro").active(true).build());
-        Currency usd = currencyRepository.save(Currency.builder().code("USD").name("US Dollar").active(true).build());
+        Currency eur = currencyRepository.findByCode("EUR").orElseThrow();
+        Currency usd = currencyRepository.findByCode("USD").orElseThrow();
 
         // Manually insert historical rates (simulating 2+ data points)
         LocalDateTime now = LocalDateTime.now();

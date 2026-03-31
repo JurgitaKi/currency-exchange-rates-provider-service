@@ -14,4 +14,4 @@ public record CurrencyResponse(
         String name,
         boolean active,
         LocalDateTime createdAt
-) {}
+) { }

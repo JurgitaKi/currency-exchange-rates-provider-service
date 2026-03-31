@@ -38,10 +38,10 @@ databaseChangeLog:
             columnNames: base_currency_id, target_currency_id
             constraintName: uq_exchange_rates_pair
         - dropForeignKeyConstraint:
-            tableName: exchange_rates
+            baseTableName: exchange_rates
             constraintName: fk_er_from_currency
         - dropForeignKeyConstraint:
-            tableName: exchange_rates
+            baseTableName: exchange_rates
             constraintName: fk_er_to_currency
         - addForeignKeyConstraint:
             baseTableName: exchange_rates
@@ -106,10 +106,10 @@ databaseChangeLog:
               - column:
                   name: timestamp
         - dropForeignKeyConstraint:
-            tableName: historical_rates
+            baseTableName: historical_rates
             constraintName: fk_hr_from_currency
         - dropForeignKeyConstraint:
-            tableName: historical_rates
+            baseTableName: historical_rates
             constraintName: fk_hr_to_currency
         - addForeignKeyConstraint:
             baseTableName: historical_rates

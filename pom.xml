@@ -183,6 +183,27 @@
                 </configuration>
             </plugin>
 
+            <!-- Maven Compiler Plugin - Enforce Java 21 with strict configuration -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <release>${java.version}</release>
+                    <!-- Keep Java 21 compilation explicit and ensure Lombok processors run reliably. -->
+                    <parameters>true</parameters>
+                    <compilerArgs>
+                        <arg>-Xlint:all</arg>
+                    </compilerArgs>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+
             <!-- JaCoCo code coverage -->
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -231,7 +252,8 @@
                 <configuration>
                     <configLocation>checkstyle.xml</configLocation>
                     <consoleOutput>true</consoleOutput>
-                    <failsOnError>false</failsOnError>
+                    <!-- ENFORCE: Build fails on Checkstyle violations -->
+                    <failsOnError>true</failsOnError>
                     <violationSeverity>warning</violationSeverity>
                     <includeTestSourceDirectory>true</includeTestSourceDirectory>
                 </configuration>
@@ -248,12 +270,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.21.2</version>
+                <!-- Updated to 3.23.0 to support Java 21+ -->
+                <version>3.23.0</version>
                 <configuration>
                     <rulesets>
                         <ruleset>pmd-ruleset.xml</ruleset>
                     </rulesets>
-                    <failOnViolation>false</failOnViolation>
+                    <!-- ENFORCE: Build fails on PMD violations -->
+                    <failOnViolation>true</failOnViolation>
                     <printFailingErrors>true</printFailingErrors>
                     <includeTests>true</includeTests>
                     <targetJdk>${java.version}</targetJdk>

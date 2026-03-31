@@ -3,7 +3,6 @@ package com.example.currencyexchange.service;
 import com.example.currencyexchange.client.ExchangeRateClient;
 import com.example.currencyexchange.dto.ExchangeRateResponse;
 import com.example.currencyexchange.dto.TrendResponse;
-import com.example.currencyexchange.exception.CurrencyNotFoundException;
 import com.example.currencyexchange.exception.ExchangeRateFetchException;
 import com.example.currencyexchange.exception.ExchangeRateNotAvailableException;
 import com.example.currencyexchange.exception.InsufficientDataException;
@@ -140,7 +139,9 @@ public class ExchangeRateService {
         Currency baseCurrency = currencyRepository.findByCode(BASE_CURRENCY).orElse(null);
 
         for (Currency targetCurrency : activeCurrencies) {
-            if (targetCurrency.getCode().equals(BASE_CURRENCY)) continue;
+            if (targetCurrency.getCode().equals(BASE_CURRENCY)) {
+                continue;
+            }
 
             ProviderRate providerRate = mergedRates.get(targetCurrency.getCode());
             if (providerRate == null) {
@@ -176,7 +177,7 @@ public class ExchangeRateService {
     // -------------------------------------------------------------------------
 
     /** Holds a single rate with provider metadata. */
-    private record ProviderRate(BigDecimal rate, String providerName) {}
+    private record ProviderRate(BigDecimal rate, String providerName) { }
 
     private Map<String, ProviderRate> fetchRatesFromAllProviders(String base, List<String> codes) {
         Map<String, ProviderRate> merged = new HashMap<>();
@@ -225,14 +226,20 @@ public class ExchangeRateService {
         // For each pair A→B compute rate using base: rate(A→B) = rate(EUR→B) / rate(EUR→A)
         for (Currency from : currencies) {
             for (Currency to : currencies) {
-                if (from.getCode().equals(to.getCode())) continue;
-                if (from.getCode().equals(BASE_CURRENCY) || to.getCode().equals(BASE_CURRENCY)) continue;
+                if (from.getCode().equals(to.getCode())) {
+                    continue;
+                }
+                if (from.getCode().equals(BASE_CURRENCY) || to.getCode().equals(BASE_CURRENCY)) {
+                    continue;
+                }
 
                 ProviderRate fromProviderRate = baseRates.get(from.getCode());
                 ProviderRate toProviderRate = baseRates.get(to.getCode());
                 BigDecimal fromRate = fromProviderRate != null ? fromProviderRate.rate() : null;
                 BigDecimal toRate = toProviderRate != null ? toProviderRate.rate() : null;
-                if (fromRate == null || toRate == null || fromRate.compareTo(BigDecimal.ZERO) == 0) continue;
+                if (fromRate == null || toRate == null || fromRate.compareTo(BigDecimal.ZERO) == 0) {
+                    continue;
+                }
 
                 BigDecimal crossRate = toRate.divide(fromRate, 10, RoundingMode.HALF_UP);
                 String provider = toProviderRate != null ? toProviderRate.providerName() : "aggregated";

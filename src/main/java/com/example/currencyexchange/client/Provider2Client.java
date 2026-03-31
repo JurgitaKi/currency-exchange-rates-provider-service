@@ -60,5 +60,5 @@ public class Provider2Client implements ExchangeRateClient {
             String base,
             Map<String, BigDecimal> rates,
             long timestamp
-    ) {}
+    ) { }
 }

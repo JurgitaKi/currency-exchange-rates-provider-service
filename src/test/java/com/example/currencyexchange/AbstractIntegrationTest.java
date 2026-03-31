@@ -9,8 +9,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
  * Base class for integration tests.
@@ -18,12 +16,10 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * Redis is disabled – cache.type is overridden to "none".
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Testcontainers
 @ActiveProfiles("integration-test")
 public abstract class AbstractIntegrationTest {
 
     @SuppressWarnings("resource")
-    @Container
     static final PostgreSQLContainer<?> POSTGRES =
             new PostgreSQLContainer<>("postgres:16-alpine")
                     .withDatabaseName("testdb")
@@ -34,6 +30,7 @@ public abstract class AbstractIntegrationTest {
             new WireMockServer(WireMockConfiguration.wireMockConfig().dynamicPort());
 
     static {
+        POSTGRES.start();
         WIREMOCK.start();
     }
 
