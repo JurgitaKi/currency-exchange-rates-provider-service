@@ -13,7 +13,7 @@ Spring Boot REST API for managing supported currencies, fetching exchange rates 
 
 ## Tech Stack
 
-- Java 17
+- Java 21
 - Spring Boot 3.2.x
 - Spring Web + WebFlux WebClient
 - Spring Data JPA
@@ -92,7 +92,7 @@ exchange.providers.openexchangerates.api-key=your-api-key
 
 Prerequisites:
 
-- Java 17 or newer
+- Java 21 or newer
 - Maven 3.9+
 
 From repository root:
