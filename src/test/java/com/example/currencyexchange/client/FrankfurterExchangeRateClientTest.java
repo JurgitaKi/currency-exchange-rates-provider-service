@@ -1,52 +1,56 @@
 package com.example.currencyexchange.client;
 
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.*;
 
 class FrankfurterExchangeRateClientTest {
 
-    private MockWebServer mockWebServer;
+    private WireMockServer wireMockServer;
     private FrankfurterExchangeRateClient client;
 
     @BeforeEach
-    void setUp() throws IOException {
-        mockWebServer = new MockWebServer();
-        mockWebServer.start();
+    void setUp() {
+        wireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig().dynamicPort());
+        wireMockServer.start();
 
-        String baseUrl = mockWebServer.url("/").toString();
+        String baseUrl = "http://localhost:" + wireMockServer.port();
         client = new FrankfurterExchangeRateClient(baseUrl, WebClient.builder());
     }
 
     @AfterEach
-    void tearDown() throws IOException {
-        mockWebServer.shutdown();
+    void tearDown() {
+        wireMockServer.stop();
     }
 
     @Test
     void fetchRates_returnsRatesFromApi() {
-        mockWebServer.enqueue(new MockResponse()
-                .setBody("""
-                        {
-                          "base": "EUR",
-                          "date": "2024-01-15",
-                          "rates": {
-                            "USD": 1.0850,
-                            "GBP": 0.8623
-                          }
-                        }
-                        """)
-                .addHeader("Content-Type", "application/json"));
+        wireMockServer.stubFor(get(urlPathEqualTo("/latest"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("""
+                                {
+                                  "base": "EUR",
+                                  "date": "2024-01-15",
+                                  "rates": {
+                                    "USD": 1.0850,
+                                    "GBP": 0.8623
+                                  }
+                                }
+                                """)));
 
         Map<String, BigDecimal> rates = client.fetchRates("EUR", List.of("USD", "GBP"));
 
@@ -58,9 +62,10 @@ class FrankfurterExchangeRateClientTest {
 
     @Test
     void fetchRates_returnsEmptyMapOnError() {
-        mockWebServer.enqueue(new MockResponse()
-                .setResponseCode(500)
-                .setBody("Internal Server Error"));
+        wireMockServer.stubFor(get(urlPathEqualTo("/latest"))
+                .willReturn(aResponse()
+                        .withStatus(500)
+                        .withBody("Internal Server Error")));
 
         assertThatThrownBy(() -> client.fetchRates("EUR", List.of("USD")))
                 .isInstanceOf(RuntimeException.class)

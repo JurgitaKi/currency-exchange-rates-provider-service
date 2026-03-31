@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/001-create-currencies.yaml
+  - include:
+      file: db/changelog/002-create-exchange-rates.yaml
+  - include:
+      file: db/changelog/003-create-historical-rates.yaml
+  - include:
+      file: db/changelog/004-create-users-roles.yaml
+  - include:
+      file: db/changelog/005-insert-default-users.yaml

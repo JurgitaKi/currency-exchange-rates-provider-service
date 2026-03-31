@@ -19,7 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -41,6 +40,9 @@ class ExchangeRateServiceTest {
     @Mock
     private HistoricalRateRepository historicalRateRepository;
 
+        @Mock
+        private RateCacheService rateCacheService;
+
     @InjectMocks
     private ExchangeRateService exchangeRateService;
 
@@ -53,6 +55,7 @@ class ExchangeRateServiceTest {
         eur = Currency.builder().id(1L).code("EUR").name("Euro").active(true).build();
         usd = Currency.builder().id(2L).code("USD").name("US Dollar").active(true).build();
         gbp = Currency.builder().id(3L).code("GBP").name("British Pound").active(true).build();
+        when(rateCacheService.get(anyString(), anyString())).thenReturn(Optional.empty());
     }
 
     @Test

@@ -1,6 +1,40 @@
 version: '3.9'
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: currencydb
+      POSTGRES_USER: currency_user
+      POSTGRES_PASSWORD: currency_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - exchange-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U currency_user -d currencydb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - exchange-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   provider-1:
     build:
       context: ./provider-1
@@ -43,14 +77,29 @@ services:
     networks:
       - exchange-network
     depends_on:
-      - provider-1
-      - provider-2
-      - provider-3
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      provider-1:
+        condition: service_started
+      provider-2:
+        condition: service_started
+      provider-3:
+        condition: service_started
     environment:
       EXCHANGE_PROVIDERS_PROVIDER1_BASE_URL: http://provider-1:8081
       EXCHANGE_PROVIDERS_PROVIDER2_BASE_URL: http://provider-2:8082
       EXCHANGE_PROVIDERS_PROVIDER3_BASE_URL: http://provider-3:8083
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/currencydb
+      SPRING_DATASOURCE_USERNAME: currency_user
+      SPRING_DATASOURCE_PASSWORD: currency_pass
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
 
 networks:
   exchange-network:
     driver: bridge
+
+volumes:
+  postgres_data:

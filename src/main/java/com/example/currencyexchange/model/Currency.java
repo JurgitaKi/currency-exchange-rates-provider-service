@@ -20,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"exchangeRates", "historicalRates"})
+@ToString(exclude = {"exchangeRates"})
 public class Currency {
 
     @Id
@@ -37,6 +37,7 @@ public class Currency {
     private String name;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean active = true;
 
     @Column(nullable = false, updatable = false)
