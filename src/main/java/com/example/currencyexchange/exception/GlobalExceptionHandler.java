@@ -29,6 +29,13 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
+    @ExceptionHandler(ExchangeRateNotAvailableException.class)
+    public ResponseEntity<ErrorResponse> handleExchangeRateNotAvailable(
+            ExchangeRateNotAvailableException ex, HttpServletRequest request) {
+        log.warn("Exchange rate not available in cache: {}", ex.getMessage());
+        return build(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), request);
+    }
+
     @ExceptionHandler(CurrencyAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleCurrencyAlreadyExists(
             CurrencyAlreadyExistsException ex, HttpServletRequest request) {

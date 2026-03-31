@@ -16,4 +16,4 @@ public record TrendResponse(
         BigDecimal endRate,
         BigDecimal changePercent,
         String trend
-) {}
+) { }

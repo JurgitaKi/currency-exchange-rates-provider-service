@@ -1,0 +1,58 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-exchange-rates
+      author: currency-exchange-service
+      comment: Create exchange_rates table storing the latest rate per currency pair
+      changes:
+        - createTable:
+            tableName: exchange_rates
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_exchange_rates
+              - column:
+                  name: from_currency_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_er_from_currency
+                    references: currencies(id)
+              - column:
+                  name: to_currency_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_er_to_currency
+                    references: currencies(id)
+              - column:
+                  name: rate
+                  type: DECIMAL(20, 10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: provider
+                  type: VARCHAR(100)
+              - column:
+                  name: fetched_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: exchange_rates
+            columnNames: from_currency_id, to_currency_id
+            constraintName: uq_exchange_rates_pair
+        - createIndex:
+            tableName: exchange_rates
+            indexName: idx_er_from_to
+            columns:
+              - column:
+                  name: from_currency_id
+              - column:
+                  name: to_currency_id
+      rollback:
+        - dropTable:
+            tableName: exchange_rates

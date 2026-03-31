@@ -1,7 +1,22 @@
 package com.example.currencyexchange.model;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,7 +26,7 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "exchange_rates",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"from_currency_id", "to_currency_id"}))
+       uniqueConstraints = @UniqueConstraint(columnNames = {"base_currency_id", "target_currency_id"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,11 +39,11 @@ public class ExchangeRate {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "from_currency_id", nullable = false)
+    @JoinColumn(name = "base_currency_id", nullable = false)
     private Currency fromCurrency;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "to_currency_id", nullable = false)
+    @JoinColumn(name = "target_currency_id", nullable = false)
     private Currency toCurrency;
 
     @Column(nullable = false, precision = 20, scale = 10)
@@ -38,7 +53,7 @@ public class ExchangeRate {
     @Column(length = 100)
     private String provider;
 
-    @Column(nullable = false)
+    @Column(name = "timestamp", nullable = false)
     private LocalDateTime fetchedAt;
 
     @PrePersist

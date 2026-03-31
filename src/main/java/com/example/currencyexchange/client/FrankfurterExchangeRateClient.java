@@ -75,5 +75,5 @@ public class FrankfurterExchangeRateClient implements ExchangeRateClient {
             String base,
             String date,
             Map<String, BigDecimal> rates
-    ) {}
+    ) { }
 }

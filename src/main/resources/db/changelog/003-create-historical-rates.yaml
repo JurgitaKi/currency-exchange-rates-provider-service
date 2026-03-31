@@ -1,0 +1,56 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-historical-rates
+      author: currency-exchange-service
+      comment: Create historical_rates table for trend analysis
+      changes:
+        - createTable:
+            tableName: historical_rates
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_historical_rates
+              - column:
+                  name: from_currency_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_hr_from_currency
+                    references: currencies(id)
+              - column:
+                  name: to_currency_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_hr_to_currency
+                    references: currencies(id)
+              - column:
+                  name: rate
+                  type: DECIMAL(20, 10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: provider
+                  type: VARCHAR(100)
+              - column:
+                  name: fetched_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: historical_rates
+            indexName: idx_hist_from_to_fetched
+            columns:
+              - column:
+                  name: from_currency_id
+              - column:
+                  name: to_currency_id
+              - column:
+                  name: fetched_at
+      rollback:
+        - dropTable:
+            tableName: historical_rates

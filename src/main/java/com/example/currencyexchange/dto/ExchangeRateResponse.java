@@ -17,4 +17,4 @@ public record ExchangeRateResponse(
         BigDecimal convertedAmount,
         String provider,
         LocalDateTime fetchedAt
-) {}
+) { }

@@ -20,12 +20,8 @@ public interface HistoricalRateRepository extends JpaRepository<HistoricalRate, 
            """)
     List<HistoricalRate> findByFromCodeAndToCodeSince(String fromCode, String toCode, LocalDateTime since);
 
-    @Query("""
-           SELECT h FROM HistoricalRate h
-           WHERE h.fromCurrency.code = :fromCode
-             AND h.toCurrency.code   = :toCode
-           ORDER BY h.fetchedAt DESC
-           LIMIT 1
-           """)
-    java.util.Optional<HistoricalRate> findLatestByFromCodeAndToCode(String fromCode, String toCode);
+    java.util.Optional<HistoricalRate> findTopByFromCurrencyCodeAndToCurrencyCodeOrderByFetchedAtDesc(
+            String fromCode,
+            String toCode
+    );
 }
