@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: provider-2
+
+server:
+  port: 8082
+
+logging:
+  level:
+    root: INFO
+    com.example.provider2: DEBUG

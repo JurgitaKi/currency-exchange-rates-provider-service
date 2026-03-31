@@ -1,0 +1,56 @@
+version: '3.9'
+
+services:
+  provider-1:
+    build:
+      context: ./provider-1
+    container_name: provider-1
+    ports:
+      - "8081:8081"
+    networks:
+      - exchange-network
+    environment:
+      SERVER_PORT: 8081
+
+  provider-2:
+    build:
+      context: ./provider-2
+    container_name: provider-2
+    ports:
+      - "8082:8082"
+    networks:
+      - exchange-network
+    environment:
+      SERVER_PORT: 8082
+
+  provider-3:
+    build:
+      context: ./provider-3
+    container_name: provider-3
+    ports:
+      - "8083:8083"
+    networks:
+      - exchange-network
+    environment:
+      SERVER_PORT: 8083
+
+  main-service:
+    build:
+      context: .
+    container_name: main-service
+    ports:
+      - "8080:8080"
+    networks:
+      - exchange-network
+    depends_on:
+      - provider-1
+      - provider-2
+      - provider-3
+    environment:
+      EXCHANGE_PROVIDERS_PROVIDER1_BASE_URL: http://provider-1:8081
+      EXCHANGE_PROVIDERS_PROVIDER2_BASE_URL: http://provider-2:8082
+      EXCHANGE_PROVIDERS_PROVIDER3_BASE_URL: http://provider-3:8083
+
+networks:
+  exchange-network:
+    driver: bridge

@@ -44,6 +44,12 @@ exchange:
     openexchangerates:
       base-url: https://openexchangerates.org/api
       # api-key: your-api-key-here  # Uncomment and set to enable OpenExchangeRates
+    provider1:
+      base-url: http://localhost:8081
+    provider2:
+      base-url: http://localhost:8082
+    provider3:
+      base-url: http://localhost:8083
 
   scheduler:
     cron: "0 0 * * * *"  # Every hour

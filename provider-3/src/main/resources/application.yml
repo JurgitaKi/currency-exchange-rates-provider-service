@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: provider-3
+
+server:
+  port: 8083
+
+logging:
+  level:
+    root: INFO
+    com.example.provider3: DEBUG
