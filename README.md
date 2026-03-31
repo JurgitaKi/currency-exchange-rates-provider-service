@@ -139,6 +139,14 @@ Prerequisites:
 - PostgreSQL running on localhost:5432 with database `currencydb`, user `currency_user`, password `currency_pass`
 - Redis running on localhost:6379
 
+The easiest way to satisfy the PostgreSQL and Redis prerequisites without running the full Docker Compose stack is to start only those two services. The application will not start without them — PostgreSQL is required for schema migrations and data storage, and Redis is required for the distributed cache on startup.
+
+```bash
+docker compose up -d postgres redis
+```
+
+Run this once before starting the application. You only need to repeat it if the containers were stopped (e.g. after a system restart or `docker compose down`).
+
 Build and run:
 
 ```bash
