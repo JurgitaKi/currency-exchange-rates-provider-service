@@ -5,6 +5,7 @@ import com.example.currencyexchange.dto.ExchangeRateResponse;
 import com.example.currencyexchange.dto.TrendResponse;
 import com.example.currencyexchange.exception.CurrencyNotFoundException;
 import com.example.currencyexchange.exception.ExchangeRateFetchException;
+import com.example.currencyexchange.exception.ExchangeRateNotAvailableException;
 import com.example.currencyexchange.exception.InsufficientDataException;
 import com.example.currencyexchange.model.Currency;
 import com.example.currencyexchange.model.ExchangeRate;
@@ -47,21 +48,18 @@ public class ExchangeRateService {
     private final RateCacheService rateCacheService;
 
     /**
-     * Converts {@code amount} from one currency to another using stored rates.
-     * Reads from the in-memory cache first; falls back to the database.
+     * Converts {@code amount} from one currency to another using cached exchange rates.
+     * Only reads from the in-memory cache (or Redis); DOES NOT fallback to database.
+     * 
+     * @throws ExchangeRateNotAvailableException if rate is not found in cache
      */
     public ExchangeRateResponse convert(BigDecimal amount, String from, String to) {
         String fromUpper = from.toUpperCase();
         String toUpper = to.toUpperCase();
 
+        // Only read from cache; no database fallback
         BigDecimal rateValue = rateCacheService.get(fromUpper, toUpper)
-            .orElseGet(() -> exchangeRateRepository.findByFromCodeAndToCode(fromUpper, toUpper)
-                .map(ExchangeRate::getRate)
-                .orElseThrow(() -> new CurrencyNotFoundException(
-                    "No exchange rate found for " + from + " -> " + to)));
-
-        ExchangeRate dbRate = exchangeRateRepository.findByFromCodeAndToCode(fromUpper, toUpper)
-            .orElse(null);
+            .orElseThrow(() -> new ExchangeRateNotAvailableException(fromUpper, toUpper));
 
         BigDecimal converted = amount.multiply(rateValue)
                 .setScale(4, RoundingMode.HALF_UP);
@@ -72,8 +70,8 @@ public class ExchangeRateService {
                 .rate(rateValue)
                 .amount(amount)
                 .convertedAmount(converted)
-                .provider(dbRate != null ? dbRate.getProvider() : "cache")
-                .fetchedAt(dbRate != null ? dbRate.getFetchedAt() : java.time.LocalDateTime.now())
+                .provider("cache")
+                .fetchedAt(java.time.LocalDateTime.now())
                 .build();
     }
 

@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/004-create-users-roles.yaml
   - include:
       file: db/changelog/005-insert-default-users.yaml
+  - include:
+      file: db/changelog/006-align-schema-naming.yaml

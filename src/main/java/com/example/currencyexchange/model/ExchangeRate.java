@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "exchange_rates",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"from_currency_id", "to_currency_id"}))
+       uniqueConstraints = @UniqueConstraint(columnNames = {"base_currency_id", "target_currency_id"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,11 +24,11 @@ public class ExchangeRate {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "from_currency_id", nullable = false)
+    @JoinColumn(name = "base_currency_id", nullable = false)
     private Currency fromCurrency;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "to_currency_id", nullable = false)
+    @JoinColumn(name = "target_currency_id", nullable = false)
     private Currency toCurrency;
 
     @Column(nullable = false, precision = 20, scale = 10)
@@ -38,7 +38,7 @@ public class ExchangeRate {
     @Column(length = 100)
     private String provider;
 
-    @Column(nullable = false)
+    @Column(name = "timestamp", nullable = false)
     private LocalDateTime fetchedAt;
 
     @PrePersist
