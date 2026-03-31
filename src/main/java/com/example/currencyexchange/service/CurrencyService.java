@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Business logic for managing supported currencies.
@@ -45,7 +46,7 @@ public class CurrencyService {
     @Transactional
     @CacheEvict(value = "currencies", allEntries = true)
     public CurrencyResponse addCurrency(String code) {
-        String upperCode = code.toUpperCase();
+        String upperCode = code.toUpperCase(Locale.ROOT);
 
         if (currencyRepository.existsByCode(upperCode)) {
             throw new CurrencyAlreadyExistsException(upperCode);
@@ -68,8 +69,8 @@ public class CurrencyService {
      * Retrieves a currency entity by code, throwing if not found.
      */
     public Currency getCurrencyByCode(String code) {
-        return currencyRepository.findByCode(code.toUpperCase())
-                .orElseThrow(() -> new CurrencyNotFoundException(code.toUpperCase()));
+        return currencyRepository.findByCode(code.toUpperCase(Locale.ROOT))
+                .orElseThrow(() -> new CurrencyNotFoundException(code.toUpperCase(Locale.ROOT)));
     }
 
     /**

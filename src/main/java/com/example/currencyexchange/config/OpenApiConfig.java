@@ -24,7 +24,8 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Currency Exchange Rates API")
                         .description(
-                                "Provides real-time and historical currency exchange rates fetched from multiple providers."
+                                "Provides real-time and historical currency exchange rates"
+                                        + " fetched from multiple providers."
                         )
                         .version("1.0.0")
                         .contact(

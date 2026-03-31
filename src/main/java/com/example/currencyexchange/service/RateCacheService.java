@@ -6,6 +6,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -82,6 +83,6 @@ public class RateCacheService {
     }
 
     private String buildKey(String from, String to) {
-        return from.toUpperCase() + "_" + to.toUpperCase();
+        return from.toUpperCase(Locale.ROOT) + "_" + to.toUpperCase(Locale.ROOT);
     }
 }

@@ -6,8 +6,22 @@
 
     <description>Reasonable PMD baseline for service, controller, and test code.</description>
 
-    <rule ref="category/java/bestpractices.xml"/>
-    <rule ref="category/java/errorprone.xml"/>
+    <rule ref="category/java/bestpractices.xml">
+        <!-- SLF4J parameterized logging is already lazy; explicit guards add noise -->
+        <exclude name="GuardLogStatement"/>
+        <!-- Test count is a design choice; many assertions are intentional in integration tests -->
+        <exclude name="JUnitTestContainsTooManyAsserts"/>
+        <!-- MockMvc andExpect() is a valid assertion form; PMD does not recognize it -->
+        <exclude name="JUnitTestsShouldIncludeAssert"/>
+        <!-- HttpHeaders and similar Spring types are used intentionally -->
+        <exclude name="LooseCoupling"/>
+        <!-- Base test classes without abstract methods is a standard JUnit pattern -->
+        <exclude name="AbstractClassWithoutAbstractMethod"/>
+    </rule>
+    <rule ref="category/java/errorprone.xml">
+        <!-- Duplicate literals in annotations and test data are acceptable -->
+        <exclude name="AvoidDuplicateLiterals"/>
+    </rule>
     <rule ref="category/java/codestyle.xml/UnnecessaryConstructor"/>
 
     <exclude-pattern>.*/target/.*</exclude-pattern>

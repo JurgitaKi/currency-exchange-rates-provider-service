@@ -6,6 +6,8 @@ package com.example.currencyexchange.exception;
  */
 public class ExchangeRateNotAvailableException extends RuntimeException {
 
+    private static final long serialVersionUID = 1L;
+
     public ExchangeRateNotAvailableException(String from, String to) {
         super("Exchange rate not available in cache for " + from + " -> " + to + 
               ". Please refresh rates from external providers.");

@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.Locale;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -39,6 +40,7 @@ public class ExchangeRateService {
 
     private static final String BASE_CURRENCY = "EUR";
     private static final Pattern PERIOD_PATTERN = Pattern.compile("^(\\d+)([HDMY])$");
+    private static final int MIN_HISTORICAL_DATA_POINTS = 2;
 
     private final List<ExchangeRateClient> clients;
     private final CurrencyRepository currencyRepository;
@@ -53,8 +55,8 @@ public class ExchangeRateService {
      * @throws ExchangeRateNotAvailableException if rate is not found in cache
      */
     public ExchangeRateResponse convert(BigDecimal amount, String from, String to) {
-        String fromUpper = from.toUpperCase();
-        String toUpper = to.toUpperCase();
+        String fromUpper = from.toUpperCase(Locale.ROOT);
+        String toUpper = to.toUpperCase(Locale.ROOT);
 
         // Only read from cache; no database fallback
         BigDecimal rateValue = rateCacheService.get(fromUpper, toUpper)
@@ -82,9 +84,9 @@ public class ExchangeRateService {
         LocalDateTime since = parsePeriod(period);
 
         List<HistoricalRate> history = historicalRateRepository
-                .findByFromCodeAndToCodeSince(from.toUpperCase(), to.toUpperCase(), since);
+                .findByFromCodeAndToCodeSince(from.toUpperCase(Locale.ROOT), to.toUpperCase(Locale.ROOT), since);
 
-        if (history.size() < 2) {
+        if (history.size() < MIN_HISTORICAL_DATA_POINTS) {
             throw new InsufficientDataException(
                     "Not enough historical data for " + from + "->" + to + " over period " + period);
         }
@@ -102,8 +104,8 @@ public class ExchangeRateService {
                 : "STABLE";
 
         return TrendResponse.builder()
-                .fromCurrency(from.toUpperCase())
-                .toCurrency(to.toUpperCase())
+                .fromCurrency(from.toUpperCase(Locale.ROOT))
+                .toCurrency(to.toUpperCase(Locale.ROOT))
                 .period(period)
                 .startRate(startRate)
                 .endRate(endRate)
@@ -139,7 +141,7 @@ public class ExchangeRateService {
         Currency baseCurrency = currencyRepository.findByCode(BASE_CURRENCY).orElse(null);
 
         for (Currency targetCurrency : activeCurrencies) {
-            if (targetCurrency.getCode().equals(BASE_CURRENCY)) {
+            if (BASE_CURRENCY.equals(targetCurrency.getCode())) {
                 continue;
             }
 
@@ -229,7 +231,7 @@ public class ExchangeRateService {
                 if (from.getCode().equals(to.getCode())) {
                     continue;
                 }
-                if (from.getCode().equals(BASE_CURRENCY) || to.getCode().equals(BASE_CURRENCY)) {
+                if (BASE_CURRENCY.equals(from.getCode()) || BASE_CURRENCY.equals(to.getCode())) {
                     continue;
                 }
 
@@ -250,7 +252,7 @@ public class ExchangeRateService {
     }
 
     private LocalDateTime parsePeriod(String period) {
-        Matcher m = PERIOD_PATTERN.matcher(period.toUpperCase());
+        Matcher m = PERIOD_PATTERN.matcher(period.toUpperCase(Locale.ROOT));
         if (!m.matches()) {
             throw new IllegalArgumentException(
                     "Invalid period format: '" + period + "'. Expected format: 12H, 10D, 3M, 1Y");
